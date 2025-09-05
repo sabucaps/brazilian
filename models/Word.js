@@ -68,6 +68,7 @@ const wordSchema = new mongoose.Schema({
 wordSchema.index({ portuguese: 'text' });
 
 // ✅ ADD REGULAR INDEX FOR SORTING AND QUERYING
-wordSchema.index({ portuguese: 1 });
+//wordSchema.index({ portuguese: 1 });
+
 
 module.exports = mongoose.model('Word', wordSchema);
