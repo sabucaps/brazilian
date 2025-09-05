@@ -75,9 +75,9 @@ app.get('/api/sentences', async (req, res) => {
   }
 });
 
-// -----------------------
+// ------------------------
 // Mount modular routes
-// -----------------------
+// ------------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/flashcards', flashcardsRoute);
 
@@ -1028,4 +1028,5 @@ process.on('uncaughtException', (error) => {
 // -----------------------
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server started on port ${PORT}`);
+
 });
