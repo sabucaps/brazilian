@@ -1,0 +1,49 @@
+{
+  "name": "portuguese-learning-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Portuguese Learning App",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "reset-db": "node reset-database.js",
+    "add-words": "node add-more-words.js",
+    "add-group-field": "node add-group-field.js",
+    "add-action-words": "node add-action-words.js",
+    "cleanup-db": "node cleanup-database.js",
+    "remove-question-fields": "node remove-question-fields.js",
+    "add-sample-stories": "node add-sample-stories.js",
+    "add-sample-grammar-lessons": "node add-sample-grammar-lessons.js"
+  },
+  "keywords": [
+    "portuguese",
+    "learning",
+    "api",
+    "backend"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^17.2.1",
+    "exceljs": "^4.4.0",
+    "expo-haptics": "~14.1.4",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.18.0",
+    "mongoose": "^8.17.1",
+    "multer": "^2.0.2",
+    "xlsx": "^0.18.5",
+    "expo-secure-store": "~14.2.4",
+    "@react-native-async-storage/async-storage": "2.1.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "nodemon": "^3.1.9"
+  }
+}
