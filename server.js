@@ -86,21 +86,33 @@ app.use('/api/flashcards', flashcardsRoute);
 // -----------------------
 // ROADMAP
 // -----------------------
-
+// ===== ROADMAP ENDPOINT =====
 app.get('/api/roadmap/user', async (req, res) => {
   try {
+    // Get user from authentication (set by authenticateToken middleware)
     const user = await User.findById(req.user.id);
-    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log(`Building roadmap for user: ${user.name} (Level: ${user.streak?.current || 1})`);
+
+    // Example roadmap structure
+    const currentLevel = user.streak?.current || 1;
+    const xp = currentLevel * 25;
+    const xpToNext = 100 - (xp % 100);
+
     const roadmap = {
-      currentLevel: user.streak.current || 1,
-      xp: (user.streak.current || 1) * 25,
+      currentLevel,
+      xp,
+      xpToNext,
       units: [
         {
           id: '1',
           title: 'Greetings & Introductions',
           description: 'Learn how to introduce yourself and greet others.',
           wordCount: 20,
-          completed: true,
+          completed: currentLevel >= 1,
           locked: false,
           lessons: [
             { id: '1', title: 'Hello & Goodbye', type: 'vocabulary', locked: false },
@@ -115,22 +127,28 @@ app.get('/api/roadmap/user', async (req, res) => {
           title: 'Daily Life',
           description: 'Talk about your routine, food, and family.',
           wordCount: 30,
-          completed: false,
-          locked: user.streak.current < 3,
+          completed: currentLevel >= 3,
+          locked: currentLevel < 3,
           requiredLevel: 3,
           lessons: [
-            { id: '6', title: 'Common Verbs', type: 'vocabulary', locked: true },
-            { id: '7', title: 'Pronouns & Conjugation', type: 'grammar', locked: true },
-            { id: '8', title: 'My Morning Routine', type: 'story', storyId: '68b60e3d87f9502cf0ad0c20', locked: true },
-            { id: '9', title: 'Fill-in-the-Gap Challenge', type: 'test', testId: '68ade514eedb532cdce2366c', locked: true }
+            { id: '6', title: 'Common Verbs', type: 'vocabulary', locked: currentLevel < 3 },
+            { id: '7', title: 'Pronouns & Conjugation', type: 'grammar', locked: currentLevel < 3 },
+            { id: '8', title: 'My Morning Routine', type: 'story', storyId: '68b60e3d87f9502cf0ad0c20', locked: currentLevel < 3 },
+            { id: '9', title: 'Fill-in-the-Gap Challenge', type: 'test', testId: '68ade514eedb532cdce2366c', locked: currentLevel < 3 }
           ]
         }
       ]
     };
 
+    console.log(`Sending roadmap with ${roadmap.units.length} units`);
+    res.header('Content-Type', 'application/json; charset=utf-8');
     res.json(roadmap);
   } catch (err) {
-    res.status(500).json({ error: 'Error loading roadmap' });
+    console.error('Error loading roadmap:', err);
+    res.status(500).json({ 
+      error: 'Error loading roadmap', 
+      details: err.message 
+    });
   }
 });
 // -----------------------
@@ -1129,6 +1147,10 @@ app.get('/health', (req, res) => res.json({ status: 'OK', message: 'Server runni
 // -----------------------
 // ERROR HANDLING
 // -----------------------
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error', details: err.message });
