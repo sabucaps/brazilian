@@ -75,9 +75,9 @@ app.get('/api/sentences', async (req, res) => {
   }
 });
 
-// ------------------------
+// -----------------------
 // Mount modular routes
-// ------------------------
+// -----------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/flashcards', flashcardsRoute);
 
@@ -993,6 +993,85 @@ app.post('/auth/change-password', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Error changing password' });
   }
 });
+// -----------------------
+// ADMIN
+// -----------------------
+const express = require('express');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const router = express.Router();
+
+// Admin schema
+const adminSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Admin = mongoose.model('Admin', adminSchema);
+
+// Setup admin credentials endpoint
+router.post('/api/admin/setup', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Validate input
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    // Check if admin already exists
+    const existingAdmin = await Admin.findOne({});
+    if (existingAdmin) {
+      // Update existing admin
+      const hashedPassword = await bcrypt.hash(password, 10);
+      existingAdmin.username = username;
+      existingAdmin.password = hashedPassword;
+      await existingAdmin.save();
+      return res.json({ message: 'Admin credentials updated successfully' });
+    }
+
+    // Create new admin
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const admin = new Admin({
+      username,
+      password: hashedPassword
+    });
+
+    await admin.save();
+    res.json({ message: 'Admin credentials created successfully' });
+  } catch (error) {
+    console.error('Error setting up admin:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Admin login endpoint
+router.post('/api/admin/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Find admin user
+    const admin = await Admin.findOne({ username });
+    if (!admin) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, admin.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Create session or JWT token
+    // For simplicity, we'll just return a success message
+    res.json({ message: 'Login successful' });
+  } catch (error) {
+    console.error('Error during admin login:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 // -----------------------
 // HEALTH CHECK
@@ -1028,5 +1107,4 @@ process.on('uncaughtException', (error) => {
 // -----------------------
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server started on port ${PORT}`);
-
 });
