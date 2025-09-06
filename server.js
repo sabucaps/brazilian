@@ -1055,7 +1055,8 @@ const adminSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const Admin = mongoose.model('Admin', adminSchema);
+const Admin = mongoose.models.Admin || mongoose.model("Admin", adminSchema);
+
 
 // Setup admin credentials endpoint
 router.post('/api/admin/setup', async (req, res) => {
