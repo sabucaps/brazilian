@@ -83,7 +83,56 @@ app.get('/api/sentences', async (req, res) => {
 // -----------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/flashcards', flashcardsRoute);
+// -----------------------
+// ROADMAP
+// -----------------------
 
+app.get('/api/roadmap/user', async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    
+    const roadmap = {
+      currentLevel: user.streak.current || 1,
+      xp: (user.streak.current || 1) * 25,
+      units: [
+        {
+          id: '1',
+          title: 'Greetings & Introductions',
+          description: 'Learn how to introduce yourself and greet others.',
+          wordCount: 20,
+          completed: true,
+          locked: false,
+          lessons: [
+            { id: '1', title: 'Hello & Goodbye', type: 'vocabulary', locked: false },
+            { id: '2', title: 'My Name is...', type: 'vocabulary', locked: false },
+            { id: '3', title: 'Present Tense of Ser', type: 'grammar', locked: false },
+            { id: '4', title: 'A Day in Lisbon', type: 'story', storyId: '68a1b4b918eb6aec1615cf90', locked: false },
+            { id: '5', title: 'Quick Quiz', type: 'test', testId: '68ade514eedb532cdce2366b', locked: true }
+          ]
+        },
+        {
+          id: '2',
+          title: 'Daily Life',
+          description: 'Talk about your routine, food, and family.',
+          wordCount: 30,
+          completed: false,
+          locked: user.streak.current < 3,
+          requiredLevel: 3,
+          lessons: [
+            { id: '6', title: 'Common Verbs', type: 'vocabulary', locked: true },
+            { id: '7', title: 'Pronouns & Conjugation', type: 'grammar', locked: true },
+            { id: '8', title: 'My Morning Routine', type: 'story', storyId: '68b60e3d87f9502cf0ad0c20', locked: true },
+            { id: '9', title: 'Fill-in-the-Gap Challenge', type: 'test', testId: '68ade514eedb532cdce2366c', locked: true }
+          ]
+        }
+      ]
+    };
+
+    res.json(roadmap);
+  } catch (err) {
+    res.status(500).json({ error: 'Error loading roadmap' });
+  }
+});
 // -----------------------
 // WORDS & GROUPS
 // -----------------------
