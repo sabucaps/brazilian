@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const bcrypt = require('bcrypt');
+const router = express.Router();
 
 // Models
 const Word = require('./models/Word');
@@ -996,11 +998,6 @@ app.post('/auth/change-password', authenticateToken, async (req, res) => {
 // -----------------------
 // ADMIN
 // -----------------------
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const router = express.Router();
-
 // Admin schema
 const adminSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
