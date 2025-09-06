@@ -50,6 +50,7 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || '*', credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/admin', require('./routes/admin'));
 
 // Logging
 app.use((req, res, next) => {
